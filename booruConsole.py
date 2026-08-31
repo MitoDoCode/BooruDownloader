@@ -5,11 +5,9 @@ import os
 import json
 import sys
 
-# ===================== EDIT =====================
-BASE_URL = "" #API endpoint
-USER_ID = ""  #numeric user ID
-API_KEY = ""  #API key             
-# =================================================
+BASE_URL = ""
+USER_ID = ""
+API_KEY = ""
 
 class BooruDownloader:
     def __init__(self, video_only, output_folder):
@@ -116,7 +114,6 @@ class BooruDownloader:
             self.log(f"{filename} - {e}")
 
     def extract_posts(self, data):
-        """Extract posts from various JSON structures."""
         if data is None:
             return []
             
@@ -209,10 +206,68 @@ class BooruDownloader:
         return total
 
 
+def save_config_to_file():
+    script_path = os.path.abspath(__file__)
+    
+    with open(script_path, 'r') as f:
+        lines = f.readlines()
+    
+    new_lines = []
+    for line in lines:
+        if line.startswith('BASE_URL ='):
+            new_lines.append(f'BASE_URL = "{BASE_URL}"\n')
+        elif line.startswith('USER_ID ='):
+            new_lines.append(f'USER_ID = "{USER_ID}"\n')
+        elif line.startswith('API_KEY ='):
+            new_lines.append(f'API_KEY = "{API_KEY}"\n')
+        else:
+            new_lines.append(line)
+    
+    with open(script_path, 'w') as f:
+        f.writelines(new_lines)
+    
+    print("\nConfiguration saved to file!")
+
+
 def main():
+    global BASE_URL, USER_ID, API_KEY
+    
     print("\n" + "="*60)
     print("Booru Art Downloader 67thousand")
     print("="*60)
+    
+    print("\n[1] Continue (Start your)")
+    print("[2] Enter missing configuration")
+    
+    choice = input("\nSelect option [1/2]: ").strip()
+    
+    if choice == "2":
+        print("\n" + "-"*60)
+        print("Enter your configuration:")
+        
+        if not BASE_URL:
+            BASE_URL = input("BASE_URL (e.g., https://website.name): ").strip()
+        
+        if not USER_ID:
+            USER_ID = input("USER_ID (your numeric user ID): ").strip()
+        
+        if not API_KEY:
+            API_KEY = input("API_KEY (your API key): ").strip()
+        
+        print("-"*60)
+        
+        save_choice = input("\nSave these settings to the file? [y/n]: ").strip().lower()
+        if save_choice == 'y':
+            save_config_to_file()
+        else:
+            print("Settings will only be used for this session.")
+        
+        print()
+    
+    if not all([BASE_URL, USER_ID, API_KEY]):
+        print("\nERROR: Missing required configuration!")
+        print("Please set BASE_URL, USER_ID, and API_KEY in the script or choose option 2.")
+        return
 
     character = input("Character name (Example: Character_Name_(Game_Name)): ").strip()
     if not character:
